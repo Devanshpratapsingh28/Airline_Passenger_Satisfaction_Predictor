@@ -1,0 +1,32 @@
+common :
+  target : satisfaction
+
+preprocess :
+  input : data/raw/data.csv
+  output : data/processed
+  artifact_path : artifacts/preprocessor.pkl
+  
+
+train :
+  data : data/processed/train.csv
+  random_state : 42
+
+  models:
+    logistic:
+      name: LogisticRegression
+      param_grid:
+        C: [0.01, 0.1,10.0]
+        penalty: ['l1', 'l2']
+        solver: ['liblinear', 'saga']
+    random_forest:
+      name: RandomForestClassifier
+      param_grid:
+        n_estimators: [100, 200]
+        min_samples_split: [2, 5, 10]
+        min_samples_leaf: [1, 2]
+  model_path: models/model.pkl    
+
+evaluate :
+  data : data/processed/test.csv  
+  model : models/model.pkl
+

@@ -1,0 +1,11 @@
+numpy
+pandas
+matplotlib
+seaborn
+jupyter
+dagshub 
+dvc
+dvc-s3
+scikit-learn
+mlflow==2.12.1
+# use python 3.10 as mllflow >=3 is not supported in dagshub as of now i.e 21 July 2025 4:11 pm.

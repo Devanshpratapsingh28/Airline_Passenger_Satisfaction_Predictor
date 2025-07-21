@@ -1,0 +1,98 @@
+schema: '2.0'
+stages:
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+    - path: data/raw/data.csv
+      hash: md5
+      md5: e9bc6d47bb330c937ad65f6b99579137
+      size: 13541485
+    - path: src/preprocess.py
+      hash: md5
+      md5: 7f51e1749b88d3fe75ab553dfbabf6ad
+      size: 3043
+    params:
+      params.yaml:
+        common.target: satisfaction
+        preprocess.artifact_path: artifacts/preprocessor.pkl
+        preprocess.input: data/raw/data.csv
+        preprocess.output: data/processed
+    outs:
+    - path: artifacts/preprocessor.pkl
+      hash: md5
+      md5: 25287af59fd1a26738aad64e1229185a
+      size: 5276
+    - path: data/processed
+      hash: md5
+      md5: 9768aca5a150e2401d67ddec0a486f96.dir
+      size: 50457758
+      nfiles: 2
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 901a5689953cc2c2b09590dcf9134172
+      size: 40364822
+    - path: src/train.py
+      hash: md5
+      md5: 6ab3f5104f1f67201b29ea63a4b45e53
+      size: 2864
+    params:
+      params.yaml:
+        common.target: satisfaction
+        train.data: data/processed/train.csv
+        train.model_path: models/model.pkl
+        train.models:
+          logistic:
+            name: LogisticRegression
+            param_grid:
+              C:
+              - 0.01
+              - 0.1
+              - 10.0
+              penalty:
+              - l1
+              - l2
+              solver:
+              - liblinear
+              - saga
+          random_forest:
+            name: RandomForestClassifier
+            param_grid:
+              n_estimators:
+              - 100
+              - 200
+              min_samples_split:
+              - 2
+              - 5
+              - 10
+              min_samples_leaf:
+              - 1
+              - 2
+        train.random_state: 42
+    outs:
+    - path: models/model.pkl
+      hash: md5
+      md5: 5531a85c22313687ae5e7d3d570100ec
+      size: 3188
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 77eb739f2fc6c2d0727f0b9dfbccefd6
+      size: 10092936
+    - path: models/model.pkl
+      hash: md5
+      md5: 5531a85c22313687ae5e7d3d570100ec
+      size: 3188
+    - path: src/evaluate.py
+      hash: md5
+      md5: 88be51d0d3f40c6bec953ea954910a6a
+      size: 637
+    params:
+      params.yaml:
+        common.target: satisfaction
+        evaluate.data: data/processed/test.csv
+        evaluate.model: models/model.pkl
